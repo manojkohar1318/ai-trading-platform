@@ -1,2 +1,2 @@
 export const stocks=[['RELIANCE',2780,1.84,87,'Bullish'],['ICICIBANK',1450,1.32,84,'Bullish'],['SBIN',820,2.12,82,'Bullish'],['INFY',1850,-.74,61,'Neutral'],['TCS',4250,-1.18,56,'Bearish'],['HDFCBANK',1740,.42,73,'Bullish'],['ITC',510,.16,68,'Neutral'],['LT',3900,-.32,64,'Neutral']];
-export const chart=Array.from({length:42},(_,i)=>({i,p:2680+i*2+Math.sin(i/2)*18+Math.sin(i/5)*12,v:600000+Math.abs(Math.sin(i))*700000}));
+export const chart=Array.from({length:42},(_,i)=>({i,p:24817.4+(95/41)*i+Math.sin(i/2)*34+Math.sin(i/5)*22,v:600000+Math.abs(Math.sin(i))*700000}));
