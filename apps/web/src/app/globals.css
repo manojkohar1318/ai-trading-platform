@@ -1,0 +1,2 @@
+@import 'tailwindcss';
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#080b12;color:#e7edf7;font-family:Inter,ui-sans-serif,system-ui,sans-serif}.terminal-grid{background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:24px 24px}.card{background:rgba(16,21,31,.88);border:1px solid #202938;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.18)}.muted{color:#7f8da3}.up{color:#36d399}.down{color:#fb7185}.accent{color:#8b9cff}

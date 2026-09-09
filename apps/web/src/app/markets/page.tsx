@@ -1,0 +1,2 @@
+import Terminal from '@/components/Terminal';
+export default function Page(){return <Terminal title="Markets"><div className="card p-8"><h1 className="text-2xl font-semibold">Markets</h1><p className="muted mt-2">Part 1 foundation is ready. This module is structured for the next implementation phase.</p><div className="mt-6 text-sm border border-amber-500/20 bg-amber-500/5 rounded-xl p-4 text-amber-200">DEMO / FOUNDATION — no live market execution is connected.</div></div></Terminal>}

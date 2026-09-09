@@ -1,0 +1,4 @@
+'use client';
+import {LineChart,Line,AreaChart,Area,XAxis,YAxis,Tooltip,ResponsiveContainer} from 'recharts';
+export default function PriceChart({data}:{data:{i:number;p:number;v:number}[]}){return <div className="h-72"><ResponsiveContainer width="100%" height="100%"><LineChart data={data}><XAxis dataKey="i" hide/><YAxis domain={['auto','auto']} orientation="right" tick={{fill:'#64748b',fontSize:10}} axisLine={false} tickLine={false}/><Tooltip contentStyle={{background:'#0d131e',border:'1px solid #253044',borderRadius:8}}/><Line type="monotone" dataKey="p" strokeWidth={2} dot={false} stroke="#8b9cff"/></LineChart></ResponsiveContainer></div>}
+export function VolumeChart({data}:{data:{i:number;p:number;v:number}[]}){return <div className="h-20"><ResponsiveContainer width="100%" height="100%"><AreaChart data={data}><Area dataKey="v" stroke="none" fill="#46506a" fillOpacity={.25}/><XAxis dataKey="i" hide/><YAxis hide/></AreaChart></ResponsiveContainer></div>}
