@@ -29,5 +29,5 @@ def provider_status(name: str) -> dict:
     return {
         "provider": normalized,
         "description": SUPPORTED_PROVIDERS[normalized],
-        "implemented": normalized in {"mock", "demo", "http"},
+        "implemented": normalized in {"mock", "demo", "http", "dhan"},
     }
