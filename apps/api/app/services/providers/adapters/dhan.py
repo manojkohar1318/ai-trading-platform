@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from datetime import datetime, timedelta
 from typing import Any
 
 import requests
@@ -77,9 +78,19 @@ class DhanMarketDataProvider(MarketDataProvider):
         limit: int = 252,
     ) -> list[Candle]:
         security_id = self.instrument_resolver.resolve(symbol)
-        raise NotImplementedError(
-            f"Dhan historical request is ready for {symbol} (security ID {security_id}); HTTP response mapping is the next step."
-        )
+        to_date = datetime.now().date()
+        from_date = to_date - timedelta(days=max(limit * 2, 30))
+        payload = {
+            "securityId": security_id,
+            "exchangeSegment": "NSE_EQ",
+            "instrument": "EQUITY",
+            "expiryCode": 0,
+            "oi": False,
+            "fromDate": from_date.isoformat(),
+            "toDate": to_date.isoformat(),
+        }
+        data = self._post("/charts/historical", payload)
+        return self._parse_candles(data, limit)
 
     def get_intraday_candles(
         self,
@@ -87,9 +98,55 @@ class DhanMarketDataProvider(MarketDataProvider):
         limit: int = 100,
     ) -> list[Candle]:
         security_id = self.instrument_resolver.resolve(symbol)
-        raise NotImplementedError(
-            f"Dhan intraday request is ready for {symbol} (security ID {security_id}); HTTP response mapping is the next step."
-        )
+        to_date = datetime.now().date()
+        from_date = to_date
+        payload = {
+            "securityId": security_id,
+            "exchangeSegment": "NSE_EQ",
+            "instrument": "EQUITY",
+            "interval": 1,
+            "oi": False,
+            "fromDate": from_date.isoformat(),
+            "toDate": to_date.isoformat(),
+        }
+        data = self._post("/charts/intraday", payload)
+        return self._parse_candles(data, limit)
+
+    @staticmethod
+    def _parse_candles(data: dict[str, Any], limit: int) -> list[Candle]:
+        rows = data.get("data", data)
+        if not isinstance(rows, dict):
+            raise ValueError("Unexpected Dhan candle response")
+
+        timestamps = rows.get("timestamp", [])
+        opens = rows.get("open", [])
+        highs = rows.get("high", [])
+        lows = rows.get("low", [])
+        closes = rows.get("close", [])
+        volumes = rows.get("volume", [])
+
+        size = min(len(timestamps), len(opens), len(highs), len(lows), len(closes), len(volumes))
+        candles: list[Candle] = []
+
+        for i in range(size):
+            ts = timestamps[i]
+            if isinstance(ts, (int, float)):
+                timestamp = datetime.fromtimestamp(ts).isoformat()
+            else:
+                timestamp = str(ts)
+
+            candles.append(
+                Candle(
+                    timestamp=timestamp,
+                    open=float(opens[i]),
+                    high=float(highs[i]),
+                    low=float(lows[i]),
+                    close=float(closes[i]),
+                    volume=int(volumes[i]),
+                )
+            )
+
+        return candles[-limit:]
 
     def get_ohlc(self, symbol: str, limit: int = 100) -> list[Candle]:
         return self.get_intraday_candles(symbol, limit)
