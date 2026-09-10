@@ -1,6 +1,7 @@
 from .market_data import MarketDataProvider, MockMarketDataProvider
 from .http_market_data import HttpMarketDataProvider
 from .providers.adapters import BrokerAdapterNotConfigured
+from .providers.adapters.dhan import DhanMarketDataProvider
 from .providers.registry import validate_provider_name
 from ..core.config import get_settings
 
@@ -20,7 +21,10 @@ def build_market_data_provider() -> MarketDataProvider:
 
     # Broker adapters will be implemented one at a time against
     # their current official APIs. Never silently fall back to demo data.
-    if name in {"dhan", "upstox", "angelone"}:
+    if name == "dhan":
+        return DhanMarketDataProvider()
+
+    if name in {"upstox", "angelone"}:
         return BrokerAdapterNotConfigured(name)
 
     raise ValueError(f"Unsupported MARKET_DATA_PROVIDER: {name}")
