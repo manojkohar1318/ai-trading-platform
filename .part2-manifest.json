@@ -1,0 +1,7 @@
+{
+  "name": "ai-trading-platform-part2-update",
+  "type": "overlay",
+  "base": "fa39ca03b36d96e98e21a2714754bb2e1a2b2cda",
+  "purpose": "Data-provider abstraction, risk engine hardening, API quality, and database indexes",
+  "demo_safe": true
+}
