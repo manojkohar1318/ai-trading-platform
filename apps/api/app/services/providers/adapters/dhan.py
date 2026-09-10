@@ -68,7 +68,7 @@ class DhanMarketDataProvider(MarketDataProvider):
             low=float(ohlc.get("low", row.get("low", 0.0))),
             prev_close=float(ohlc.get("close", row.get("prev_close", 0.0))),
             volume=int(row.get("volume", 0)),
-            change_pct=float(row.get("percent_change", 0.0)),
+            change_pct=((float(row["last_price"]) - float(ohlc.get("close", row.get("prev_close", 0.0)))) / float(ohlc.get("close", row.get("prev_close", 0.0))) * 100.0) if float(ohlc.get("close", row.get("prev_close", 0.0))) else 0.0,
             is_demo=False,
         )
 
