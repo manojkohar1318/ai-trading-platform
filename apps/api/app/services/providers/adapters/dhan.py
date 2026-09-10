@@ -6,6 +6,7 @@ from typing import Any
 import requests
 
 from ...market_data import Candle, MarketDataProvider, Quote
+from ..instrument_resolver import DhanInstrumentResolver
 
 
 class DhanMarketDataProvider(MarketDataProvider):
@@ -19,6 +20,9 @@ class DhanMarketDataProvider(MarketDataProvider):
     def __init__(self) -> None:
         self.access_token = os.getenv("DHAN_ACCESS_TOKEN")
         self.client_id = os.getenv("DHAN_CLIENT_ID")
+        self.instrument_resolver = DhanInstrumentResolver(
+            os.getenv("DHAN_INSTRUMENT_MASTER_PATH", "data/dhan-instruments.csv")
+        )
 
         if not self.access_token:
             raise ValueError("DHAN_ACCESS_TOKEN is required")
@@ -45,8 +49,21 @@ class DhanMarketDataProvider(MarketDataProvider):
         return response.json()
 
     def get_quote(self, symbol: str) -> Quote:
-        raise NotImplementedError(
-            "Dhan quote mapping requires the Dhan security ID for the symbol."
+        security_id = self.instrument_resolver.resolve(symbol)
+        payload = {
+            "NSE_EQ": [int(security_id)],
+        }
+        data = self._post("/marketfeed/quote", payload)
+        row = data.get("data", {}).get("NSE_EQ", {}).get(str(security_id), {})
+        if not row:
+            raise ValueError(f"Dhan returned no quote for {symbol} ({security_id})")
+
+        return Quote(
+            symbol=symbol.upper(),
+            price=float(row["last_price"]),
+            change=float(row.get("net_change", 0.0)),
+            change_percent=float(row.get("percent_change", 0.0)),
+            volume=int(row.get("volume", 0)),
         )
 
     def get_historical_data(
@@ -54,8 +71,9 @@ class DhanMarketDataProvider(MarketDataProvider):
         symbol: str,
         limit: int = 252,
     ) -> list[Candle]:
+        security_id = self.instrument_resolver.resolve(symbol)
         raise NotImplementedError(
-            "Dhan historical data requires the Dhan security ID mapping."
+            f"Dhan historical request is ready for {symbol} (security ID {security_id}); HTTP response mapping is the next step."
         )
 
     def get_intraday_candles(
@@ -63,8 +81,9 @@ class DhanMarketDataProvider(MarketDataProvider):
         symbol: str,
         limit: int = 100,
     ) -> list[Candle]:
+        security_id = self.instrument_resolver.resolve(symbol)
         raise NotImplementedError(
-            "Dhan intraday data requires the Dhan security ID mapping."
+            f"Dhan intraday request is ready for {symbol} (security ID {security_id}); HTTP response mapping is the next step."
         )
 
     def get_ohlc(self, symbol: str, limit: int = 100) -> list[Candle]:
