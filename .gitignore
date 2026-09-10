@@ -16,3 +16,6 @@ apps/api/data/dhan-instruments.csv
 
 # Dhan instrument master (downloaded/runtime data)
 apps/api/data/dhan-instruments.csv
+
+# TypeScript build cache
+*.tsbuildinfo
