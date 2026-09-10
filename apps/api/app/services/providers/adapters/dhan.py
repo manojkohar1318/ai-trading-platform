@@ -58,12 +58,17 @@ class DhanMarketDataProvider(MarketDataProvider):
         if not row:
             raise ValueError(f"Dhan returned no quote for {symbol} ({security_id})")
 
+        ohlc = row.get("ohlc", {})
         return Quote(
             symbol=symbol.upper(),
             price=float(row["last_price"]),
-            change=float(row.get("net_change", 0.0)),
-            change_percent=float(row.get("percent_change", 0.0)),
+            open=float(ohlc.get("open", row.get("open", 0.0))),
+            high=float(ohlc.get("high", row.get("high", 0.0))),
+            low=float(ohlc.get("low", row.get("low", 0.0))),
+            prev_close=float(ohlc.get("close", row.get("prev_close", 0.0))),
             volume=int(row.get("volume", 0)),
+            change_pct=float(row.get("percent_change", 0.0)),
+            is_demo=False,
         )
 
     def get_historical_data(
