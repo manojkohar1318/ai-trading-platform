@@ -50,3 +50,35 @@ def test_dhan_quote_calculates_change_pct():
     assert quote.price == 1020.0
     assert quote.prev_close == 1000.0
     assert quote.is_demo is False
+
+def test_dhan_quote_change_pct(monkeypatch):
+    from app.services.providers.adapters.dhan import DhanMarketDataProvider
+
+    provider = object.__new__(DhanMarketDataProvider)
+    provider.instrument_resolver = type(
+        "Resolver", (), {"resolve": lambda self, symbol: "2885"}
+    )()
+    provider._post = lambda path, payload: {
+        "data": {
+            "NSE_EQ": {
+                "2885": {
+                    "last_price": 2500.0,
+                    "ohlc": {
+                        "open": 2480.0,
+                        "high": 2520.0,
+                        "low": 2470.0,
+                        "close": 2450.0,
+                    },
+                    "volume": 123456,
+                }
+            }
+        }
+    }
+
+    quote = provider.get_quote("RELIANCE")
+
+    assert quote.price == 2500.0
+    assert quote.prev_close == 2450.0
+    assert quote.volume == 123456
+    assert abs(quote.change_pct - 2.0408163265306123) < 1e-9
+    assert quote.is_demo is False
