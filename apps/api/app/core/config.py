@@ -1,3 +1,4 @@
+from dotenv import load_dotenv; load_dotenv()
 from functools import lru_cache
 import os
 
