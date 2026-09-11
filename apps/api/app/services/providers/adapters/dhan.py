@@ -107,8 +107,8 @@ class DhanMarketDataProvider(MarketDataProvider):
             "instrument": "EQUITY",
             "interval": 1,
             "oi": False,
-            "fromDate": from_date.isoformat(),
-            "toDate": to_date.isoformat(),
+            "fromDate": from_date.strftime("%Y-%m-%d %H:%M:%S"),
+            "toDate": to_date.strftime("%Y-%m-%d %H:%M:%S"),
         }
         data = self._post("/charts/intraday", payload)
         return self._parse_candles(data, limit)
