@@ -7,3 +7,11 @@ export async function getMarketSession() {
   if (!response.ok) throw new Error("Failed to load market session");
   return response.json();
 }
+
+export async function getProviderStatus() {
+  const response = await fetch(`${API_BASE}/api/v1/providers/status`, {
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("Failed to load provider status");
+  return response.json();
+}
