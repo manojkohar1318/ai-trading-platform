@@ -15,3 +15,12 @@ def test_market_session_holiday():
 
     assert result["session"] == "CLOSED"
     assert result["is_open"] is False
+
+def test_market_session_next_trading_session_skips_holiday():
+    from datetime import datetime
+    from zoneinfo import ZoneInfo
+    from app.services.market_session import market_session
+
+    result = market_session(datetime(2026, 9, 14, 16, 30, tzinfo=ZoneInfo("Asia/Kolkata")))
+
+    assert result["next_session_open"] == "2026-09-15T09:15:00+05:30"
