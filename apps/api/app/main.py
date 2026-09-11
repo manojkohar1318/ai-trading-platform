@@ -5,6 +5,7 @@ from .services.analyzer import analyze
 from .services.ai import MockLLMProvider, TradingAIService
 from .services.risk import RiskInput, calculate_position_size
 from .services.market_session import market_session
+from .services.providers.registry import provider_status
 
 app = FastAPI(title="Indian Trading AI API", version="0.2.0")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000","http://127.0.0.1:3000"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
@@ -70,6 +71,12 @@ def assistant(payload: dict):
     return {"answer":ai.answer(q),"data_status":"DEMO",
             "facts":[],"calculations":[],"estimates":[],
             "warnings":["AI provider is not configured; this is a DEMO response."]}
+
+
+@app.get("/api/v1/providers/status")
+def providers_status():
+    from .core.config import get_settings
+    return provider_status(get_settings().market_data_provider)
 
 
 @app.get("/api/v1/market/session")

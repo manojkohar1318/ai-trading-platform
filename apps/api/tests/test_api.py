@@ -24,3 +24,10 @@ def test_market_session_next_trading_session_skips_holiday():
     result = market_session(datetime(2026, 9, 14, 16, 30, tzinfo=ZoneInfo("Asia/Kolkata")))
 
     assert result["next_session_open"] == "2026-09-15T09:15:00+05:30"
+
+def test_provider_status():
+    response = client.get("/api/v1/providers/status")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["provider"] == "mock"
+    assert body["implemented"] is True
