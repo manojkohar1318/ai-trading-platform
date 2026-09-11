@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import requests
+import time
 
 from ...market_data import Candle, MarketDataProvider, Quote
 from ..instrument_resolver import DhanInstrumentResolver
@@ -40,14 +41,26 @@ class DhanMarketDataProvider(MarketDataProvider):
         }
 
     def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
-        response = requests.post(
-            f"{self.BASE_URL}{path}",
-            headers=self.headers,
-            json=payload,
-            timeout=10,
-        )
-        response.raise_for_status()
-        return response.json()
+        last_error: Exception | None = None
+        for attempt in range(3):
+            try:
+                response = requests.post(
+                    f"{self.BASE_URL}{path}",
+                    headers=self.headers,
+                    json=payload,
+                    timeout=10,
+                )
+                if response.status_code not in {429, 500, 502, 503, 504}:
+                    response.raise_for_status()
+                    return response.json()
+                response.raise_for_status()
+            except requests.RequestException as exc:
+                last_error = exc
+                if attempt < 2:
+                    time.sleep(0.5 * (2 ** attempt))
+                    continue
+                raise
+        raise RuntimeError("Dhan request failed after retries") from last_error
 
     def get_quote(self, symbol: str) -> Quote:
         security_id = self.instrument_resolver.resolve(symbol)
