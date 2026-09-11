@@ -7,6 +7,7 @@ import MarketSession from "@/components/MarketSession";
 export default function Home() {
   return (
     <Terminal>
+      <div className="mb-4"><MarketSession /></div>
       <div className="flex items-end justify-between mb-6">
         <div>
           <h1 className="text-2xl font-semibold">Market Command Center</h1>
