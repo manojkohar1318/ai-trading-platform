@@ -122,3 +122,34 @@ def test_dhan_intraday_uses_datetime_range():
     assert len(captured["payload"]["toDate"]) == 19
     assert " " in captured["payload"]["toDate"]
     assert len(candles) == 1
+
+def test_dhan_post_retries_transient_failure(monkeypatch):
+    from app.services.providers.adapters.dhan import DhanMarketDataProvider
+
+    provider = object.__new__(DhanMarketDataProvider)
+    provider.access_token = "test"
+    provider.client_id = "test"
+
+    class Response:
+        def __init__(self, status_code):
+            self.status_code = status_code
+
+        def raise_for_status(self):
+            if self.status_code >= 400:
+                import requests
+                raise requests.HTTPError(f"HTTP {self.status_code}")
+
+        def json(self):
+            return {"ok": True}
+
+    calls = {"count": 0}
+
+    def fake_post(*args, **kwargs):
+        calls["count"] += 1
+        return Response(503 if calls["count"] < 3 else 200)
+
+    monkeypatch.setattr("app.services.providers.adapters.dhan.requests.post", fake_post)
+    monkeypatch.setattr("app.services.providers.adapters.dhan.time.sleep", lambda _: None)
+
+    assert provider._post("/test", {}) == {"ok": True}
+    assert calls["count"] == 3
