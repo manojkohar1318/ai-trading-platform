@@ -98,8 +98,9 @@ class DhanMarketDataProvider(MarketDataProvider):
         limit: int = 100,
     ) -> list[Candle]:
         security_id = self.instrument_resolver.resolve(symbol)
-        to_date = datetime.now().date()
-        from_date = to_date
+        now = datetime.now()
+        from_date = now.replace(hour=9, minute=15, second=0, microsecond=0)
+        to_date = now
         payload = {
             "securityId": security_id,
             "exchangeSegment": "NSE_EQ",
