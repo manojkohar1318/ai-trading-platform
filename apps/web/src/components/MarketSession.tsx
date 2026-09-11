@@ -10,6 +10,7 @@ type MarketSessionData = {
   timestamp: string;
   market_open: string;
   market_close: string;
+  next_session_open: string;
 };
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -51,8 +52,8 @@ export default function MarketSession() {
     data.session === "OPEN"
       ? `Closes ${data.market_close} IST`
       : data.session === "POST_MARKET"
-        ? `Next session ${data.market_open} IST`
-        : `Next session ${data.market_open} IST`;
+        ? `Next session ${new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(data.next_session_open))}`
+        : `Next session ${new Intl.DateTimeFormat("en-IN", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(data.next_session_open))}`;
 
   return (
     <Metric
