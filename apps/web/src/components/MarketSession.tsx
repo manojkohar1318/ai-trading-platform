@@ -1,5 +1,7 @@
-import Metric from "./Metric";
 "use client";
+
+import Metric from "./Metric";
+
 
 import { useEffect, useState } from "react";
 
