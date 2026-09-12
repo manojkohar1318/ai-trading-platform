@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from .services.provider_factory import build_market_data_provider
+from .core.config import settings
 from .services.analyzer import analyze
 from .services.ai import MockLLMProvider, TradingAIService
 from .services.risk import RiskInput, calculate_position_size
@@ -8,7 +9,7 @@ from .services.market_session import market_session
 from .services.providers.registry import provider_status
 
 app = FastAPI(title="Indian Trading AI API", version="0.2.0")
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000","http://127.0.0.1:3000"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=[origin.strip() for origin in settings.cors_origins.split(",") if origin.strip()], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 provider = build_market_data_provider()
 ai = TradingAIService(MockLLMProvider())
 

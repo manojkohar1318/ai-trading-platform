@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_BASE = "/backend";
 
 export async function getMarketSession() {
   const response = await fetch(`${API_BASE}/api/v1/market/session`, {
