@@ -10,9 +10,9 @@ export default function Home() {
     <Terminal>
       <div className="mb-4"><MarketSession />
         <ProviderStatus /></div>
-      <div className="flex items-end justify-between mb-6">
+      <div className="flex flex-col items-start gap-3 mb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Market Command Center</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold">Market Command Center</h1>
           <p className="muted text-sm mt-1">
             A quantitative snapshot for Indian equities.
           </p>
@@ -21,7 +21,7 @@ export default function Home() {
           All figures are DEMO
         </span>
       </div>
-      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 gap-2 sm:gap-3 mb-4">
         <Metric label="NIFTY 50" value="24,912.40" change="+0.62%" />
         <Metric label="BANK NIFTY" value="54,182.15" change="+0.41%" />
         <Metric label="Advances" value="1,267" change="Breadth 1.35×" />
@@ -31,8 +31,8 @@ export default function Home() {
           change="Next session 09:15 IST"
         />
       </div>
-      <div className="grid xl:grid-cols-[1.5fr_1fr] gap-4">
-        <div className="card p-4">
+      <div className="grid gap-3 sm:gap-4 xl:grid-cols-[1.5fr_1fr]">
+        <div className="card p-3 sm:p-4">
           <div className="flex justify-between">
             <div>
               <div className="text-sm font-medium">
@@ -47,7 +47,7 @@ export default function Home() {
           <PriceChart data={chart} />
           <VolumeChart data={chart} />
         </div>
-        <div className="card p-4">
+        <div className="card p-3 sm:p-4">
           <div className="flex justify-between mb-3">
             <div className="text-sm font-medium">AI Market Brief</div>
             <span className="text-[10px] muted">PLACEHOLDER</span>
@@ -57,7 +57,7 @@ export default function Home() {
             signals are mixed-to-positive; wait for validated live data before
             acting.
           </p>
-          <div className="mt-4 grid grid-cols-2 gap-2">
+          <div className="mt-3 grid grid-cols-2 gap-2">
             <div className="bg-[#0c121c] rounded-lg p-3">
               <div className="text-xs muted">Bias</div>
               <div className="mt-1 up">Constructive</div>
@@ -69,7 +69,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="grid xl:grid-cols-2 gap-4 mt-4">
+      <div className="grid gap-4 mt-4 xl:grid-cols-2">
         <div>
           <div className="flex justify-between mb-3">
             <h2 className="font-medium">Strongest Stocks</h2>
