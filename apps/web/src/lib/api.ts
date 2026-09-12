@@ -23,3 +23,18 @@ export async function getMarketsOverview() {
   if (!response.ok) throw new Error("Failed to load markets overview");
   return response.json();
 }
+
+export async function getScanner(minScore = 65, trend?: string) {
+  const params = new URLSearchParams({
+    min_score: String(minScore),
+    limit: "10",
+  });
+  if (trend) params.set("trend", trend);
+
+  const response = await fetch(`${API_BASE}/api/v1/scanner?${params.toString()}`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) throw new Error("Failed to load scanner");
+  return response.json();
+}
