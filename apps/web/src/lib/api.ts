@@ -15,3 +15,11 @@ export async function getProviderStatus() {
   if (!response.ok) throw new Error("Failed to load provider status");
   return response.json();
 }
+
+export async function getMarketsOverview() {
+  const response = await fetch(`${API_BASE}/api/v1/markets/overview`, {
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error("Failed to load markets overview");
+  return response.json();
+}
