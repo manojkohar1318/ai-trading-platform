@@ -23,9 +23,6 @@ export default function Scanner() {
 
   useEffect(() => {
     let active = true;
-    setLoading(true);
-    setError('');
-
     getScanner(minScore, trend || undefined)
       .then((result) => {
         if (active) setData(result);

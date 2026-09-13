@@ -1,2 +1,121 @@
-import Terminal from '@/components/Terminal'; import Metric from '@/components/Metric'; import PriceChart,{VolumeChart} from '@/components/PriceChart'; import {chart} from '@/lib/demo';
-export default async function Stock({params}:{params:Promise<{symbol:string}>}){const {symbol}=await params; return <Terminal title={`Stocks / ${symbol}`}><div className="flex items-end justify-between mb-5"><div><div className="text-xs muted">NSE · DEMO</div><h1 className="text-2xl font-semibold mt-1">{symbol}</h1></div><div className="text-right"><div className="text-2xl">₹2,780.00</div><div className="up text-sm">+1.84%</div></div></div><div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4"><Metric label="RSI (14)" value="61.8"/><Metric label="EMA 21" value="₹2,741"/><Metric label="VWAP" value="₹2,762"/><Metric label="ATR (14)" value="₹38.4"/></div><div className="grid xl:grid-cols-[1.6fr_1fr] gap-4"><div className="card p-4"><div className="text-sm font-medium">Price & volume</div><div className="text-xs muted mt-1">Synthetic historical candles · DEMO</div><PriceChart data={chart}/><VolumeChart data={chart}/></div><div className="card p-5"><div className="flex justify-between"><span className="text-sm font-medium">Quant Score</span><span className="text-2xl font-semibold accent">87<span className="text-xs muted">/100</span></span></div><div className="mt-5 space-y-3">{[['Trend','91'],['Momentum','88'],['Volume','84'],['Structure','90'],['Volatility','79'],['Risk / Reward','86']].map(([a,b])=><div key={a}><div className="flex justify-between text-xs"><span className="muted">{a}</span><span>{b}</span></div><div className="h-1.5 bg-[#1b2432] rounded mt-1"><div className="h-full bg-[#7d8ff1] rounded" style={{width:`${b}%`}}/></div></div>)}</div><div className="mt-5 pt-4 border-t border-[#202938]"><div className="text-xs muted">Trade setup estimate</div><div className="grid grid-cols-2 gap-3 mt-3 text-sm"><div>Entry <b>₹2,770–2,790</b></div><div>Target <b className="up">₹2,856</b></div><div>Stop <b className="down">₹2,724</b></div><div>R/R <b>1:2.0</b></div></div><p className="text-[11px] muted mt-3">Estimate only. Not a guaranteed outcome or financial advice.</p></div></div></div></Terminal>}
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import Terminal from "@/components/Terminal";
+import Link from "next/link";
+import { getStock } from "@/lib/api";
+
+export default function StockAnalyzer() {
+  const params = useParams();
+  const symbol = String(params?.symbol || "").toUpperCase();
+  const [data, setData] = useState<any>(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!symbol) return;
+    getStock(symbol).then(setData).catch((e) => setError(e.message));
+  }, [symbol]);
+
+  return (
+    <Terminal title={`Stock Analyzer — ${symbol || "Select Stock"}`}>
+      <div className="space-y-6">
+        <div>
+          <Link href="/stocks" className="muted text-sm">← Stocks</Link>
+          <h1 className="text-3xl font-semibold mt-2">{symbol}</h1>
+          <p className="muted mt-1">Quantitative analysis and trade setup engine</p>
+        </div>
+
+        {error && <div className="card p-5 text-red-300">{error}</div>}
+        {!data && !error && <div className="card p-8 muted">Analyzing {symbol}…</div>}
+
+        {data && (
+          <>
+            <div className="card p-6">
+              <div className="flex flex-wrap justify-between gap-4">
+                <div>
+                  <div className="muted text-sm">Current Price</div>
+                  <div className="text-3xl font-semibold">
+                    ₹{Number(data.quote?.price ?? 0).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                  </div>
+                </div>
+                <div>
+                  <div className="muted text-sm">Change</div>
+                  <div className="text-xl font-semibold">
+                    {Number(data.quote?.change_pct ?? 0).toFixed(2)}%
+                  </div>
+                </div>
+                <div>
+                  <div className="muted text-sm">Score</div>
+                  <div className="text-3xl font-semibold">{data.score?.total_score ?? "—"}</div>
+                </div>
+                <div>
+                  <div className="muted text-sm">Trend</div>
+                  <div className="text-xl font-semibold uppercase">{data.trend ?? "—"}</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="card p-5">
+                <h2 className="font-semibold mb-4">Technical Indicators</h2>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {Object.entries(data.indicators ?? {}).map(([key, value]) => (
+                    <div key={key} className="border border-[#202938] rounded-lg p-3">
+                      <div className="muted">{key.replaceAll("_", " ").toUpperCase()}</div>
+                      <div className="font-medium mt-1">{Number(value).toFixed(2)}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="card p-5">
+                <h2 className="font-semibold mb-4">Structure & Levels</h2>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between"><span className="muted">Support</span><b>₹{Number(data.structure?.support ?? 0).toFixed(2)}</b></div>
+                  <div className="flex justify-between"><span className="muted">Resistance</span><b>₹{Number(data.structure?.resistance ?? 0).toFixed(2)}</b></div>
+                  <div className="flex justify-between"><span className="muted">Breakout</span><b>{data.structure?.breakout_breakdown ?? "none"}</b></div>
+                  <div className="flex justify-between"><span className="muted">Higher Highs</span><b>{String(data.structure?.higher_highs)}</b></div>
+                  <div className="flex justify-between"><span className="muted">Higher Lows</span><b>{String(data.structure?.higher_lows)}</b></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="card p-5">
+              <h2 className="font-semibold mb-4">Score Breakdown</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {Object.entries(data.score?.component_scores ?? {}).map(([key, value]) => (
+                  <div key={key} className="border border-[#202938] rounded-lg p-4">
+                    <div className="muted text-sm">{key.replaceAll("_", " ").toUpperCase()}</div>
+                    <div className="text-xl font-semibold mt-1">{Number(value).toFixed(1)}/100</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="card p-6">
+              <h2 className="font-semibold text-lg">Trade Setup</h2>
+              {data.trade_setup ? (
+                <pre className="mt-4 text-sm overflow-auto">{JSON.stringify(data.trade_setup, null, 2)}</pre>
+              ) : (
+                <div className="mt-4">
+                  <div className="text-xl font-semibold">NO TRADE SETUP</div>
+                  <div className="muted mt-1">The engine did not identify a sufficiently defined setup.</div>
+                </div>
+              )}
+            </div>
+
+            <div className="card p-5">
+              <div className="text-xs uppercase tracking-wide muted">
+                {data.data_status || "DEMO"} DATA
+              </div>
+              <div className="muted text-sm mt-1">
+                Analysis is informational only and does not guarantee trading outcomes.
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </Terminal>
+  );
+}

@@ -38,3 +38,11 @@ export async function getScanner(minScore = 65, trend?: string) {
   if (!response.ok) throw new Error("Failed to load scanner");
   return response.json();
 }
+
+export async function getStock(symbol: string) {
+  const response = await fetch(`${API_BASE}/api/v1/stocks/${encodeURIComponent(symbol)}`, {
+    cache: "no-store",
+  });
+  if (!response.ok) throw new Error(`Failed to load ${symbol}`);
+  return response.json();
+}
