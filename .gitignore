@@ -19,3 +19,5 @@ apps/api/data/dhan-instruments.csv
 
 # TypeScript build cache
 *.tsbuildinfo
+
+apps/web/next-env.d.ts
